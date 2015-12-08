@@ -14,7 +14,7 @@ class test(object):
 
         self.obj = sphere(radius=5.0, color=(self.red, self.green, self.blue))
 
-	self.testR = box(pos=(11,0,0), size=(0.05,1,1), color=color.green)
+	self.testR = box(pos=(10,0,0), size=(0.05,1,1), color=color.green)
 
     def changeColor(self,x,y,z):
         #start = time.ctime()
@@ -69,14 +69,19 @@ class test(object):
 
     def run(self):
 	thread.start_new_thread(self.dataStart, ())
-	#thread.start_new_thread(self.ball, ())
+	thread.start_new_thread(self.ball, ())
 
     def dataStart(self):
+	#create something that defines the trajectory
 	t=0
-        self.testR.velocity = vector(-50,-20,0)
-        deltat = 0.005
-	while t<3:
-	    rate(50)
+        deltat = 0.05
+	while True:
+
+	    xvec = -10*np.sin(t)
+	    yvec = 10*np.cos(t)
+	    print t, xvec
+	    rate(30)
+	    self.testR.velocity = vector(xvec,yvec,0)
 	    self.testR.pos = self.testR.pos + self.testR.velocity*deltat
 	    t = t+deltat
 
