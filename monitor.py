@@ -6,20 +6,20 @@ import psutil
 class test(object):
     def __init__(self):
         print "start"
-        self.x = 0
-        self.y = 0
-        self.z = 1
+        self.red = 0
+        self.green = 0
+        self.blue = 1
 	self.cpuLoad = 0
 
-        self.obj = sphere(radius=1.0, color=(self.x, self.y, self.z))
+        self.obj = sphere(radius=1.0, color=(self.red, self.green, self.blue))
 
     def changeColor(self,x,y,z):
         start = time.ctime()
-        #print start
-        currentX = self.x
-        currentY = self.y
-        currentZ = self.z
-        print currentX, x, currentY, y, currentZ, z
+        print "time", start
+        currentX = self.red
+        currentY = self.green
+        currentZ = self.blue
+        #print currentX, x, currentY, y, currentZ, z
 
         #print "xarr"
         xarr = self.gotToValue(currentX, x)
@@ -42,9 +42,9 @@ class test(object):
             self.y = yarr[i]
             self.z = zarr[i]
 
-        self.x = x
-        self.y = y
-        self.z = z
+        self.red = x
+        self.green = y
+        self.blue = z
         self.obj.color  = (x,y,z)      
 
 
@@ -56,6 +56,9 @@ class test(object):
 	if startVal == 1 and endVal == 1:
 	    arr.fill(1)
 	    return arr
+	if startVal == endVal:
+	    arr.fill(endVal)
+	    return arr
         if endVal < startVal:
             arr=(np.arange(start = endVal, stop = startVal, step = np.absolute((endVal - startVal)/100.)))
             return np.fliplr([arr])[0]
@@ -64,22 +67,29 @@ class test(object):
 
     def cpuStat(self):
 	percs = psutil.cpu_percent(interval=0, percpu=True)
-        for cpu_num, perc in enumerate(percs):
-            print (" CPU%-2s %5s%%" % (cpu_num,perc))
 	print percs, np.sum(percs)/(len(percs)*100)
 	self.cpuLoad = np.sum(percs)/(len(percs)*100)
-	primary = np.median([percs[0],percs[2]])/100.
-	secondary = np.median([percs[1],percs[3]])/100.
-	if primary  < 0.25:
-	    self.changeColor(0, self.y, 1)  
-	if primary >=0.25:
-	    self.changeColor(1, self.y, 0)
+	if self.cpuLoad  < 0.25:
+	    self.blue = 1
+	    self.red = 0
+	    self.green = 0
+	if self.cpuLoad >=0.25 and self.cpuLoad <=.75:
+	    self.green = self.cpuLoad
+	    self.blue = 0
+	    self.red = 0
+	if self.cpuLoad >.75:
+	    self.red = self.cpuLoad 
+	    self.blue = 0
+	    self.green = 0
 
 
     def run(self):
 	while True:
 		self.cpuStat()
-		time.sleep(1)
+		#print self.red, self.green, self.blue
+		# implement
+		self.changeColor(self.red, self.green, self.blue)
+		time.sleep(.1)
 
 if __name__ == "__main__":
     t = test()
