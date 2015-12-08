@@ -2,6 +2,7 @@ from visual import *
 import time
 import numpy as np
 import psutil
+import thread
 
 class test(object):
     def __init__(self):
@@ -11,7 +12,9 @@ class test(object):
         self.blue = 1
 	self.cpuLoad = 0
 
-        self.obj = sphere(radius=1.0, color=(self.red, self.green, self.blue))
+        self.obj = sphere(radius=5.0, color=(self.red, self.green, self.blue))
+
+	self.testR = box(pos=(11,0,0), size=(0.05,1,1), color=color.green)
 
     def changeColor(self,x,y,z):
         #start = time.ctime()
@@ -64,6 +67,19 @@ class test(object):
         else:
             return np.arange(start = startVal, stop = endVal, step = np.absolute((startVal - endVal)/100.))
 
+    def run(self):
+	thread.start_new_thread(self.dataStart, ())
+	#thread.start_new_thread(self.ball, ())
+
+    def dataStart(self):
+	t=0
+        self.testR.velocity = vector(-50,-20,0)
+        deltat = 0.005
+	while t<3:
+	    rate(50)
+	    self.testR.pos = self.testR.pos + self.testR.velocity*deltat
+	    t = t+deltat
+
     def cpuStat(self):
 	percs = psutil.cpu_percent(interval=0, percpu=True)
 	#print percs, np.sum(percs)/(len(percs)*100)
@@ -82,7 +98,8 @@ class test(object):
 	    green = 0
 	self.changeColor(red, green, blue)
 
-    def run(self):
+    def ball(self):
+	scene.autoscale = False
 	while True:
 		self.cpuStat()
 		#print self.red, self.green, self.blue
