@@ -22,27 +22,17 @@ class test(object):
 
 
     def changeColor(self,x,y,z):
-        #start = time.ctime()
-        #print "time", start
         currentX = self.red
         currentY = self.green
         currentZ = self.blue
-        #print currentX, x, currentY, y, currentZ, z
 
 	xarr = self.gotToValue(currentX, x)
 	yarr = self.gotToValue(currentY, y)
 	zarr = self.gotToValue(currentZ, z)
         
-	#print "xarr"
-        #print xarr
-        #print "yarr"
-        #print yarr
-        #print "zarr"
-        #print zarr
        	loadArr = self.loadStat()
         for i in range(100):
             rate(75)
-            #print xarr[i], yarr[i], zarr[i]
             
 	    self.obj.color = (xarr[i],yarr[i],zarr[i])
 	    if len(loadArr)>=100:
@@ -58,7 +48,6 @@ class test(object):
 
     def gotToValue(self,startVal, endVal):
         arr = np.empty(100)
-        #print "gotozero:",startVal, endVal, (startVal - endVal)/100.
         if  startVal ==0 and endVal == 0:
             return np.zeros(100)
 	if startVal == 1 and endVal == 1:
@@ -128,6 +117,18 @@ class test(object):
 	while True:
 		self.cpuStat()
 
+    def getUsers(self):
+	arr = []
+	us = psutil.users()
+	for u in us: 
+		if u[0] in arr:
+			pass
+		else:
+			arr.append(u[0])
+	print arr
+	return arr
+
+
 if __name__ == "__main__":
     t = test()
-    t.run()
+    #t.run()
