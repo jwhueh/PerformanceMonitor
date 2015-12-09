@@ -3,18 +3,23 @@ import time
 import numpy as np
 import psutil
 import thread
+import os
 
 class test(object):
     def __init__(self):
-        print "start"
+
+	self.sphereRadius = 5.0
         self.red = 0
         self.green = 0
         self.blue = 1
 	self.cpuLoad = 0
+	self.compLoad = 0
 
-        self.obj = sphere(radius=5.0, color=(self.red, self.green, self.blue))
+        self.obj = sphere(radius=self.sphereRadius, color=(self.red, self.green, self.blue))
 
 	self.testR = box(pos=(10,0,0), size=(0.05,1,1), color=color.green)
+
+
 
     def changeColor(self,x,y,z):
         #start = time.ctime()
@@ -34,15 +39,16 @@ class test(object):
         #print yarr
         #print "zarr"
         #print zarr
-        
+       	loadArr = self.loadStat()
         for i in range(100):
             rate(75)
             #print xarr[i], yarr[i], zarr[i]
             
 	    self.obj.color = (xarr[i],yarr[i],zarr[i])
-            self.x = xarr[i]
-            self.y = yarr[i]
-            self.z = zarr[i]
+	    if len(loadArr)>=100:
+	    	self.obj.radius = loadArr[i]*self.sphereRadius
+	    else:
+		print 'length',  len(loadArr)
 
         self.red = x
         self.green = y
@@ -68,10 +74,10 @@ class test(object):
             return np.arange(start = startVal, stop = endVal, step = np.absolute((startVal - endVal)/100.))
 
     def run(self):
-	thread.start_new_thread(self.dataStart, ())
-	thread.start_new_thread(self.ball, ())
+	#thread.start_new_thread(self.dataRun, ())
+	thread.start_new_thread(self.sphereRun, ())
 
-    def dataStart(self):
+    def dataRun(self):
 	#create something that defines the trajectory
 	t=0
         deltat = 0.05
@@ -79,7 +85,7 @@ class test(object):
 
 	    xvec = -10*np.sin(t)
 	    yvec = 10*np.cos(t)
-	    print t, xvec
+	    #print t, xvec
 	    rate(30)
 	    self.testR.velocity = vector(xvec,yvec,0)
 	    self.testR.pos = self.testR.pos + self.testR.velocity*deltat
@@ -103,12 +109,24 @@ class test(object):
 	    green = 0
 	self.changeColor(red, green, blue)
 
-    def ball(self):
-	scene.autoscale = False
+    def loadStat(self):
+	arr =  np.empty(100)
+	av1, av2, av3 = os.getloadavg()	
+	av = av1
+	#print av1, av2, av3, self.compLoad
+	if self.compLoad == av:
+	    arr.fill(av)
+	if self.compLoad < av:
+	    arr = np.arange(start = self.compLoad, stop = av, step = np.absolute(( self.compLoad- av)/100))
+	if self.compLoad > av:
+	    arr = np.arange(start = av, stop = self.compLoad, step = np.absolute((av - self.compLoad)/100.))
+	    arr = np.fliplr([arr])[0]
+	self.compLoad = av
+	return arr
+
+    def sphereRun(self):
 	while True:
 		self.cpuStat()
-		#print self.red, self.green, self.blue
-		# implement
 
 if __name__ == "__main__":
     t = test()
